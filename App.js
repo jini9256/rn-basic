@@ -10,7 +10,8 @@ import {
   View,
 } from "react-native";
 import { AntDesign, FontAwesome5, Octicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   // Add Todo만들기
@@ -21,7 +22,7 @@ export default function App() {
   const [category, setCategory] = useState("");
   const [editText, setEditText] = useState("");
 
-  console.log("edit", editText);
+  // console.log("edit", editText);
 
   const newTodo = {
     text,
@@ -93,6 +94,30 @@ export default function App() {
     setTodos(newTodos);
   };
 
+  // todos가 변할때마다 저장해준다
+  useEffect(() => {
+    const saveTodos = async () => {
+      await AsyncStorage.setItem("todos", JSON.stringify(todos));
+    };
+    if (todos.length > 0) saveTodos();
+  }, [todos]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const resp_todos = await AsyncStorage.getItem("todos");
+      const resp_cat = await AsyncStorage.getItem("category");
+      setTodos(JSON.parse(resp_todos) ?? []);
+      setCategory(resp_cat ?? "js");
+    };
+    getData();
+  }, []);
+
+  const setCat = async (cat) => {
+    // console.log("cat", cat);
+    setCategory(cat);
+    await AsyncStorage.setItem("category", cat);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
@@ -104,7 +129,7 @@ export default function App() {
               backgroundColor: category === "js" ? "#FD8A8A" : "grey",
             }}
             onPress={() => {
-              setCategory("js");
+              setCat("js");
             }}
           >
             <Text style={styles.btnText}>JavaScript</Text>
@@ -116,7 +141,7 @@ export default function App() {
               backgroundColor: category === "react" ? "#FD8A8A" : "grey",
             }}
             onPress={() => {
-              setCategory("react");
+              setCat("react");
             }}
           >
             <Text style={styles.btnText}>React</Text>
@@ -128,7 +153,7 @@ export default function App() {
               backgroundColor: category === "ct" ? "#FD8A8A" : "grey",
             }}
             onPress={() => {
-              setCategory("ct");
+              setCat("ct");
             }}
           >
             <Text style={styles.btnText}>CodingTest</Text>
