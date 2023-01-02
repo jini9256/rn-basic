@@ -1,4 +1,6 @@
 import { StatusBar } from "expo-status-bar";
+import Tabs from "./components/Tabs";
+import Todo from "./components/Todo";
 import {
   Alert,
   SafeAreaView,
@@ -9,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AntDesign, FontAwesome5, Octicons } from "@expo/vector-icons";
+
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -122,51 +124,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <View style={styles.btnTab}>
-          <TouchableOpacity
-            style={{
-              ...styles.tab,
-              backgroundColor: category === "js" ? "#FD8A8A" : "grey",
-            }}
-            onPress={() => {
-              setCat("js");
-            }}
-          >
-            <Text style={styles.btnText}>JavaScript</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              ...styles.tab,
-              backgroundColor: category === "react" ? "#FD8A8A" : "grey",
-            }}
-            onPress={() => {
-              setCat("react");
-            }}
-          >
-            <Text style={styles.btnText}>React</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              ...styles.tab,
-              backgroundColor: category === "ct" ? "#FD8A8A" : "grey",
-            }}
-            onPress={() => {
-              setCat("ct");
-            }}
-          >
-            <Text style={styles.btnText}>CodingTest</Text>
-          </TouchableOpacity>
-        </View>
-        {/* 탭박스 아래의 실선 */}
-        {/* <View
-          style={{
-            borderBottomColor: "black",
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            marginBottom: 5,
-          }}
-        /> */}
+        <Tabs setCat={setCat} category={category} />
 
         {/* 상단 픽스 부분의 인풋박스 */}
         <View style={styles.inputWrapper}>
@@ -185,56 +143,16 @@ export default function App() {
           {todos.map((todo) => {
             if (category === todo.category) {
               return (
-                <View key={todo.id} style={styles.todo}>
-                  {todo.isEdit ? (
-                    <TextInput
-                      onSubmitEditing={() => {
-                        editTodo(todo.id);
-                      }}
-                      value={editText}
-                      onChangeText={setEditText}
-                      style={{ backgroundColor: "white", flex: "1" }}
-                    />
-                  ) : (
-                    <Text
-                      style={{
-                        textDecorationLine: todo.isDone
-                          ? "line-through"
-                          : "none",
-                      }}
-                    >
-                      {todo.text}
-                    </Text>
-                  )}
-
-                  <View style={styles.img}>
-                    {/* 현재 클릭한 todo의 id값을 넘겨준다 */}
-                    <TouchableOpacity onPress={() => setDone(todo.id)}>
-                      <Octicons
-                        style={{ marginLeft: 10 }}
-                        name="tasklist"
-                        size={24}
-                        color="black"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setEdit(todo.id)}>
-                      <FontAwesome5
-                        style={{ marginLeft: 10 }}
-                        name="edit"
-                        size={24}
-                        color="black"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteTodo(todo.id)}>
-                      <AntDesign
-                        style={{ marginLeft: 10 }}
-                        name="delete"
-                        size={24}
-                        color="black"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                <Todo
+                  key={todo.id}
+                  todo={todo}
+                  editTodo={editTodo}
+                  setDone={setDone}
+                  setEdit={setEdit}
+                  deleteTodo={deleteTodo}
+                  setEditText={setEditText}
+                  editText={editText}
+                />
               );
             }
           })}
@@ -254,23 +172,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  btnTab: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  tab: {
-    backgroundColor: "#FD8A8A",
-    paddingHorizontal: 10,
-    paddingVertical: 15,
-    width: "30%",
-    alignItems: "center",
-  },
-
-  btnText: {
-    fontWeight: "600",
-  },
-
   inputWrapper: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
@@ -288,18 +189,4 @@ const styles = StyleSheet.create({
   //   width: "95%",
   //   // backgroundColor: "orange",
   // },
-
-  todo: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    backgroundColor: "#9EA1D4",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  img: {
-    flexDirection: "row",
-    // marginRight: 10,
-  },
 });
